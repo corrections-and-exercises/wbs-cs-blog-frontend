@@ -1,8 +1,16 @@
 import { useState } from 'react';
+import { Navigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import Loading from './Loading';
 import { loginUser } from '../utils/authUtils';
 
-const Login = () => {
+const Login = ({
+  isAuthenticated,
+  setToken,
+  setIsAuthenticated,
+  loadingAuthRequest,
+  setLoadingAuthRequest
+}) => {
   const [{ email, password }, setFormState] = useState({
     email: '',
     password: ''
@@ -13,14 +21,22 @@ const Login = () => {
   const handleSubmit = async e => {
     try {
       e.preventDefault();
-      if (!email || !password) return toast.error('Please fill out all the fields');
-      const token = await loginUser({ email, password });
-      console.log(token);
+      if (!email || !password) throw new Error('Email and password are required');
+      setLoadingAuthRequest(true);
+      const { data, error } = await loginUser({ email, password });
+      if (error) throw error;
+      setToken(data.token);
+      setIsAuthenticated(true);
+      setLoadingAuthRequest(false);
+      localStorage.setItem('token', data.token);
     } catch (error) {
+      setLoadingAuthRequest(false);
       toast.error(error.message);
     }
   };
 
+  if (loadingAuthRequest) return <Loading />;
+  if (isAuthenticated) return <Navigate to='/auth' />;
   return (
     <div className='row justify-content-center'>
       <div className='col-md-4'>
@@ -28,11 +44,25 @@ const Login = () => {
           <label htmlFor='inputEmail' className='sr-only'>
             Email address
           </label>
-          <input type='email' id='email' className='form-control' placeholder='Email address' value={email} onChange={handleChange} />
+          <input
+            type='email'
+            id='email'
+            className='form-control'
+            placeholder='Email address'
+            value={email}
+            onChange={handleChange}
+          />
           <label htmlFor='inputPassword' className='sr-only'>
             Password
           </label>
-          <input type='password' id='password' className='form-control' placeholder='Password' value={password} onChange={handleChange} />
+          <input
+            type='password'
+            id='password'
+            className='form-control'
+            placeholder='Password'
+            value={password}
+            onChange={handleChange}
+          />
           <button className='btn btn-lg btn-primary btn-block mt-3' type='submit'>
             Sign in
           </button>

@@ -27,7 +27,7 @@ const CreatePost = () => {
           image,
           body
         },
-        { headers: { Authorization: localStorage.getItem("token") } }
+        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }}
       );
       navigate(`/posts/${data._id}`, { replace: true });
     } catch (error) {

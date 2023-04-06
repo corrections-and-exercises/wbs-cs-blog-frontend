@@ -1,29 +1,57 @@
 export const getUser = async token => {
   try {
-    // Implement the logic to get the user info after sending the token in the authorization header
-    const user = {};
-    return user;
+    const res = await fetch(`${process.env.REACT_APP_BLOG_API}/auth/me`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    if (!res.ok) {
+      const { error } = await res.json();
+      throw new Error(error);
+    }
+    const data = await res.json();
+    return { data };
   } catch (error) {
-    throw error;
+    return { error };
+  }
+};
+export const registerUser = async credentials => {
+  try {
+    const res = await fetch(`${process.env.REACT_APP_BLOG_API}/auth/signup`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(credentials)
+    });
+    if (!res.ok) {
+      const { error } = await res.json();
+      throw new Error(error);
+    }
+    const data = await res.json();
+    return { data };
+  } catch (error) {
+    return { error };
   }
 };
 
-export const registerUser = async formData => {
+export const loginUser = async credentials => {
   try {
-    // Implement the logic to get a token after signup
-    const token = 'this should be a real token';
-    return token;
+    const res = await fetch(`${process.env.REACT_APP_BLOG_API}/auth/signin`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(credentials)
+    });
+    if (!res.ok) {
+      const { error } = await res.json();
+      throw new Error(error);
+    }
+    const data = await res.json();
+    return { data };
   } catch (error) {
-    throw error;
-  }
-};
-
-export const loginUser = async formData => {
-  try {
-    // Implement the logic to get a token after login
-    const token = 'this should be a real token';
-    return token;
-  } catch (error) {
-    throw error;
+    return { error };
   }
 };
